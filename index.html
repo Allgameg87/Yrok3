@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ФОТО ДНЯ | PIXABAY</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="particles"></canvas>
+    <div class="grid-lines"></div>
+    
+    <div class="container">
+        <header>
+            <div class="header-glow"></div>
+            <h1 class="glitch" data-text="ФОТО ДНЯ">ФОТО ДНЯ</h1>
+            <div class="subtitle-wrapper">
+                <span class="subtitle-line"></span>
+                <p class="subtitle">ЕЖЕДНЕВНАЯ ДОЗА ВДОХНОВЕНИЯ</p>
+                <span class="subtitle-line"></span>
+            </div>
+        </header>
+
+        <main>
+            <div class="photo-container">
+                <div class="image-wrapper">
+                    <div class="image-border-glow"></div>
+                    <div class="corner-decoration top-left"></div>
+                    <div class="corner-decoration top-right"></div>
+                    <div class="corner-decoration bottom-left"></div>
+                    <div class="corner-decoration bottom-right"></div>
+                    <img id="photo-image" src="" alt="Фото дня" class="photo">
+                    <div class="loading" id="loading">
+                        <div class="loading-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <p>ЗАГРУЗКА...</p>
+                    </div>
+                </div>
+                
+                <div class="photo-info">
+                    <div class="photographer-info">
+                        <div class="info-label">
+                            <span class="label-text">ФОТОГРАФ</span>
+                            <div class="label-line"></div>
+                        </div>
+                        <div class="photographer-details">
+                            <span id="photographer-name" class="photographer-name">—</span>
+                            <a id="photographer-link" href="#" target="_blank" class="photographer-link">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="like-section">
+                        <button id="like-btn" class="like-btn">
+                            <div class="btn-glow"></div>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                            <span id="like-text">ЛАЙК</span>
+                        </button>
+                        <div class="like-count">
+                            <span class="count-number" id="like-count">0</span>
+                            <span class="count-label">ЛАЙКОВ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="refresh-btn" class="btn btn-primary">
+                    <span class="btn-text">НОВОЕ ФОТО</span>
+                    <div class="btn-bg"></div>
+                </button>
+                <button id="history-btn" class="btn btn-secondary">
+                    <span class="btn-text">ИСТОРИЯ</span>
+                    <div class="btn-bg"></div>
+                </button>
+            </div>
+        </main>
+
+        <div id="history-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">ИСТОРИЯ ПРОСМОТРОВ</h2>
+                    <button class="close-btn" id="close-modal">
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="history-list" class="history-list">
+                        <p class="empty-history">ИСТОРИЯ ПУСТА</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Частицы на фоне
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        const particleCount = 50;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(0, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
